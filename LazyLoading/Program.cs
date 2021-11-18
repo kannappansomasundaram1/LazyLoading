@@ -1,47 +1,66 @@
 ﻿using System;
-using System.Diagnostics.CodeAnalysis;
+using System.Collections.Generic;
 using System.Linq;
-using static LinqChallenges.Utilities;
+using System.Threading.Tasks;
+using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Running;
+using static LazyLoading.TimeRecorder;
+using static LazyLoading.Utilities;
 
-namespace LinqChallenges
+namespace LazyLoading;
+
+public class Program
 {
-    [SuppressMessage("ReSharper", "UseMethodAny.0")]
-    class Program
+    static async Task Main(string[] args)
     {
-        static void Main(string[] args)
-        {
-            Action example =
-                // Example_1;
-                // Example_2;
-                Example_3;
-                // Example_4;
-                // Example_5;
-                // Example_6;
-                // Example_7;
-                // Example_8;
-                // Example_9;
-                // Example_10;
-                // Example_11;
+        var examples = new Examples();
+        var example = examples.
+            Example_1;
+            // Example_2;
+            // Example_3;
+            // Example_4;
+            // Example_5;
+            // Example_6;
+            // Example_7;
+            // Example_8;
 
-            TimeRecorder.RecordTime(example);
+            RecordTime(example);
 
-        }
+        #region Async
 
-        private static void Example_1()
-        {
-            var items = GetItems().ToList();
-            PrintAllItems(items);
-            PrintCount(items);
-        }
+            // Example_9();
+            // Example_10();
+        // await RecordTime(example);
 
-        private static void Example_2()
+        #endregion
+
+        #region Benchmark
+
+        // BenchmarkRunner.Run(typeof(Program).Assembly);
+
+        #endregion
+    }
+
+    [MemoryDiagnoser]
+    public class Examples
+    {
+        [Benchmark(Baseline = true)]
+        public void Example_1()
         {
             var items = GetItems();
             PrintAllItems(items);
             PrintCount(items);
         }
 
-        private static void Example_3()
+        [Benchmark]
+        public void Example_2()
+        {
+            var items = GetItems().ToArray();
+            PrintAllItems(items);
+            PrintCount(items);
+        }
+
+        public void Example_3()
         {
             var items = GetItems();
             PrintAllItems(items);
@@ -49,80 +68,84 @@ namespace LinqChallenges
                 Console.WriteLine("Hurrah, we have some items");
         }
 
-        private static void Example_4()
+        public void Example_4()
         {
             var items = GetItems().ToArray();
             var firstEndingWith2 = items.First(item => item.EndsWith("2"));
-            Console.WriteLine("----------------------------");
-            Console.WriteLine($"First Item ending with 2: {firstEndingWith2 }");
+            Console.WriteLine("----------------------------------");
+            Console.WriteLine($"First Item ending with 2: {firstEndingWith2}");
         }
 
-        private static void Example_5()
+        public void Example_5()
         {
             var firstEndingWith2 = GetItems().First(item => item.EndsWith("2"));
-            Console.WriteLine("----------------------------");
-            Console.WriteLine($"First Item ending with 2: {firstEndingWith2 }");
+            Console.WriteLine("----------------------------------");
+            Console.WriteLine($"First Item ending with 2: {firstEndingWith2}");
         }
 
-        private static void Example_6()
+        public void Example_6()
         {
-            var items = GetItems().ToList();
-            var filteredItem = new ItemsProvider().FilterItems(items);
-            Console.WriteLine($"filtered Item : {filteredItem}");
-        }
-
-        private static void Example_7()
-        {
-            var items = GetItems();
-            var filteredItem = new ItemsProvider().FilterItems(items);
-            Console.WriteLine($"filtered Item : {filteredItem}");
-        }
-
-        private static void Example_8()
-        {
-            var items = GetItems()
-                .Select((x, i) =>
-                    new PriorityItems {Item = x, Priority = i+1 });
-            var sortedByPriority = new SortedPriorityItems_1(items);
-            Console.WriteLine($"count : {sortedByPriority.PriorityItems.Count()}");
-            Console.WriteLine("-------------------------------");
-            Console.WriteLine($"First : {sortedByPriority.PriorityItems.First()}");
-        }
-
-        private static void Example_9()
-        {
-            var items = GetItems()
-                .Select((x, i) =>
-                    new PriorityItems {Item = x, Priority = i+1 });
-            var sortedByPriority = new SortedPriorityItems_2(items);
-            Console.WriteLine($"count : {sortedByPriority.PriorityItems.Count()}");
-            Console.WriteLine("----------------------------");
-            Console.WriteLine($"First : {sortedByPriority.PriorityItems.First()}");
-        }
-
-        private static void Example_10()
-        {
-            var items = GetItems().ToList();
-            var Top3Items = items.Take(3).Select(x =>
-            {
-                var s = $"Transformed {x}";
-                Console.WriteLine(s);
-                return s;
-            }).ToList();
+            var items = GetItems().ToArray();
+            var Top3Items = items
+                .Take(3)
+                .Select(x => $"Transformed {x}")
+                .ToArray();
 
             PrintAllItems(Top3Items);
             PrintCount(Top3Items);
         }
 
-        private static void Example_11()
+        public void Example_7()
         {
-            #region Comments
-            //Doesn't clearly state the collection is in memory.
-            //Callers materialize the collection assuming multiple enumeration could happen
-            #endregion
-            var items = new ItemsProvider().GetCached_Items_1().ToList();
-            PrintAllItems(items);
-            PrintCount(items);
+            var items = GetItems();
+            var SortedItems = new SortedItems_1(items);
+
+            Console.WriteLine($"First : {SortedItems.Items.First()}");
+            Console.WriteLine($"Last  : {SortedItems.Items.Last()}");
+        }
+
+        public void Example_8()
+        {
+            var items = GetItems();
+            var SortedItems = new SortedItems_2(items);
+            Console.WriteLine($"First : {SortedItems.Items.First()}");
+            Console.WriteLine($"Last  : {SortedItems.Items.Last()}");
+        }
+
+        public async Task Example_9()
+        {
+            var itemTasks = GetItemsAsync();
+
+            Console.WriteLine("Watching final episode in a netflix series");
+            Console.WriteLine("Finished watching final episode in a netflix series");
+
+            foreach (var itemTask in itemTasks)
+            {
+                Console.WriteLine($"Got {await itemTask}");
+            }
+
+            foreach (var itemTask in itemTasks)
+            {
+                Console.WriteLine($"Processing {await itemTask}");
+            }
+        }
+
+        public async Task Example_10()
+        {
+            var itemTasks = GetItemsAsync().ToArray();
+
+            Console.WriteLine("Watching final episode in a netflix series");
+            Console.WriteLine("Finished watching final episode in a netflix series");
+
+            foreach (var itemTask in itemTasks)
+            {
+                Console.WriteLine($"Got {await itemTask}");
+            }
+
+            foreach (var itemTask in itemTasks)
+            {
+                Console.WriteLine($"Processing {await itemTask}");
+            }
         }
     }
 }

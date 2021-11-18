@@ -1,20 +1,32 @@
 using System;
 using System.Diagnostics;
+using System.Threading.Tasks;
 
-namespace LinqChallenges
+namespace LazyLoading;
+
+internal static class TimeRecorder
 {
-    internal static class TimeRecorder
+    public static void RecordTime(Action action)
     {
-        public static void RecordTime(Action action)
-        {
-            var stopWatch = new Stopwatch();
-            stopWatch.Start();
-            Console.WriteLine("----------------------------");
+        var stopWatch = new Stopwatch();
+        stopWatch.Start();
+        Console.WriteLine("----------------------------------");
 
-            action();
+        action();
 
-            Console.WriteLine("----------------------------");
-            Console.WriteLine($"Total time taken: {stopWatch.Elapsed.TotalSeconds}");
-        }
+        Console.WriteLine("----------------------------------");
+        Console.WriteLine($"Total time taken: {stopWatch.Elapsed.TotalSeconds}");
+    }
+
+    public static async Task RecordTime(Task task)
+    {
+        var stopWatch = new Stopwatch();
+        stopWatch.Start();
+        Console.WriteLine("----------------------------------");
+
+        await task;
+
+        Console.WriteLine("----------------------------------");
+        Console.WriteLine($"Total time taken: {stopWatch.Elapsed.TotalSeconds}");
     }
 }

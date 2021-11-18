@@ -3,34 +3,51 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 
-namespace LinqChallenges
+namespace LazyLoading;
+
+internal static class Utilities
 {
-    internal static class Utilities
+    public static void PrintCount(IEnumerable<string> items)
     {
-        public static void PrintCount(IEnumerable<string> todoList)
-        {
-            Console.WriteLine("----------------------------");
-            Console.WriteLine($"Total Items : {todoList.Count()}");
-        }
+        Console.WriteLine("----------------------------------");
+        Console.WriteLine("Counting Items");
+        var count = items.Count();
+        Console.WriteLine($"Total Items : {count}");
+        Console.WriteLine("----------------------------------");
+    }
 
-        public static void PrintAllItems(IEnumerable<string> todoList)
-        {
-            var allItems = new StringBuilder();
-            foreach (var todoItem in todoList)
-                allItems.Append(todoItem + " ");
-            Console.WriteLine(allItems.ToString());
-            Console.WriteLine("----------------------------------");
-        }
+    public static void PrintAllItems(IEnumerable<string> items)
+    {
+        Console.WriteLine("----------------------------------");
+        Console.WriteLine("Printing all items");
+        var allItems = new StringBuilder();
+        foreach (var todoItem in items)
+            allItems.Append(todoItem + " ");
+        Console.WriteLine(allItems.ToString());
+        Console.WriteLine("----------------------------------");
+    }
 
-        public static IEnumerable<string> GetItems()
-        {
-            return Enumerable.Range(1, 5)
-                .Select(x => {
-                    Thread.Sleep(1000);
-                    Console.WriteLine($"Getting {x}");
-                    return $"Item {x}";
-                });
-        }
+    public static IEnumerable<string> GetItems()
+    {
+        return Enumerable.Range(1, 5)
+            .Select(x =>
+            {
+                Thread.Sleep(1000);
+                Console.WriteLine($"Getting {x}");
+                return $"Item {x}";
+            });
+    }
+
+    public static IEnumerable<Task<string>> GetItemsAsync()
+    {
+        return Enumerable.Range(1, 5)
+            .Select(async x =>
+            {
+                Console.WriteLine($"Calling API to get {x}");
+                await Task.Delay(1000);
+                return $"Item {x}";
+            });
     }
 }
