@@ -8,10 +8,17 @@ namespace LinqChallenges
     public class ItemsProvider
     {
         private readonly IReadOnlyList<string> _cachedItems;
+
         public ItemsProvider()
         {
-            _cachedItems = new List<string> { "Cached Item 1", "Cached Item 2", "Cached Item 3" };
+            _cachedItems = new List<string> {"Cached Item 1", "Cached Item 2", "Cached Item 3"};
         }
+
+        public IEnumerable<string> GetCached_Items_1()
+        {
+            return _cachedItems;
+        }
+
         public IEnumerable<string> GetItems_1()
         {
             return GetItems();
@@ -33,11 +40,6 @@ namespace LinqChallenges
                 .ToList();
             items.ForEach(y => Console.WriteLine($"Publishing some metrics for item {y}"));
             return items;
-        }
-
-        public IEnumerable<string> GetCached_Items_1()
-        {
-            return _cachedItems;
         }
 
         public IReadOnlyCollection<string> GetCached_Items_2()

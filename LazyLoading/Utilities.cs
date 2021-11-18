@@ -26,14 +26,11 @@ namespace LinqChallenges
         public static IEnumerable<string> GetItems()
         {
             return Enumerable.Range(1, 5)
-                .Select(GetItem);
-        }
-
-        private static string GetItem(int x)
-        {
-            Thread.Sleep(1000);
-            Console.WriteLine($"Getting {x}");
-            return $"Item {x}";
+                .Select(x => {
+                    Thread.Sleep(1000);
+                    Console.WriteLine($"Getting {x}");
+                    return $"Item {x}";
+                });
         }
     }
 }
