@@ -22,10 +22,8 @@ internal static class Utilities
     {
         Console.WriteLine("----------------------------------");
         Console.WriteLine("Printing all items");
-        var allItems = new StringBuilder();
-        foreach (var todoItem in items)
-            allItems.Append(todoItem + " ");
-        Console.WriteLine(allItems.ToString());
+        foreach (var item in items)
+            Console.WriteLine(item);
         Console.WriteLine("----------------------------------");
     }
 
